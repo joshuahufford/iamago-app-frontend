@@ -2,6 +2,7 @@ import { Alert, Button, Center, Container, Loader, Stack, Text } from '@mantine/
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
+import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { directoryApi } from '@/api/directory';
 import type { RecommendationRequest } from '@/api/types';
 import { ResultsView } from '@/discovery/ResultsView';
@@ -60,12 +61,17 @@ export function RecommendationsPage() {
   }
 
   return (
-    <Container size="lg" py="xl">
-      <ResultsView
-        result={query.data}
-        onStartOver={() => navigate('/')}
-        shareUrl={window.location.href}
-      />
-    </Container>
+    <>
+      {/* Enough atmosphere to match the homepage; the arcs stay off because the
+          cards and map already carry plenty of detail. */}
+      <AmbientBackdrop variant="subtle" />
+      <Container size="lg" py="xl" style={{ position: 'relative', zIndex: 1 }}>
+        <ResultsView
+          result={query.data}
+          onStartOver={() => navigate('/')}
+          shareUrl={window.location.href}
+        />
+      </Container>
+    </>
   );
 }

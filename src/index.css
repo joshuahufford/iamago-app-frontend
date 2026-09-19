@@ -7,3 +7,13 @@ body,
 body {
   margin: 0;
 }
+
+/* Decorative backdrop arcs. Opacity lives here rather than on the element
+   because `light-dark()` only accepts colours, so it cannot set a number. */
+.ambient-arcs {
+  opacity: 0.55;
+}
+
+[data-mantine-color-scheme='dark'] .ambient-arcs {
+  opacity: 0.45;
+}
