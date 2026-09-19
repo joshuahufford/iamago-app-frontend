@@ -13,6 +13,8 @@ function mockDirectoryEndpoints() {
     if (url === '/directory/map-config/')
       return Promise.resolve({ data: { google_maps_api_key: '', maps_enabled: false } });
     if (url === '/auth/me/') return Promise.resolve({ data: mockUser });
+    if (url.startsWith('/patients/'))
+      return Promise.resolve({ data: { count: 0, next: null, previous: null, results: [] } });
     return Promise.resolve({ data: {} });
   });
 }
@@ -41,14 +43,18 @@ describe('routing', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the dashboard for an authenticated user', async () => {
+  it('renders the patient dashboard for an authenticated user', async () => {
     tokenStore.set({ access: 'access-token', refresh: 'refresh-token' });
     mockDirectoryEndpoints();
 
     renderWithProviders(<App />, { route: '/dashboard' });
 
+    // The dashboard greets them and offers their two records, rather than the
+    // build-status placeholder it used to be.
+    expect(await screen.findByRole('heading', { name: /welcome back, ada/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /past searches/i })).toBeInTheDocument();
     expect(
-      await screen.findByRole('heading', { name: /dashboard/i }),
+      screen.getByRole('tab', { name: /practitioners i contacted/i }),
     ).toBeInTheDocument();
   });
 

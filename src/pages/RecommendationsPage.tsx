@@ -2,6 +2,7 @@ import { Alert, Button, Center, Container, Loader, Stack, Text } from '@mantine/
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
+import { SaveSearchButton } from '@/discovery/SaveSearchButton';
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { directoryApi } from '@/api/directory';
 import type { RecommendationRequest } from '@/api/types';
@@ -66,6 +67,7 @@ export function RecommendationsPage() {
           cards and map already carry plenty of detail. */}
       <AmbientBackdrop variant="subtle" />
       <Container size="lg" py="xl" style={{ position: 'relative', zIndex: 1 }}>
+        <SaveSearchButton searchId={query.data.id} token={token} />
         <ResultsView
           result={query.data}
           onStartOver={() => navigate('/')}

@@ -227,3 +227,30 @@ export interface PortalListingUpdate {
   accepting_new_patients?: boolean;
   accepts_insurance?: boolean;
 }
+
+// --- Patient dashboard ----------------------------------------------------
+
+export interface SavedSearch {
+  id: string;
+  claim_token: string;
+  location_label: string;
+  radius_miles: number;
+  concerns: HealthConcern[];
+  modalities: Modality[];
+  result_count: number;
+  practitioner_names: string[];
+  created_at: string;
+}
+
+export interface SavedEnquiry {
+  id: string;
+  practitioner_id: string;
+  practitioner_name: string;
+  status: ContactRequestStatus;
+  share_concerns: boolean;
+  consent_text: string;
+  message: string;
+  first_viewed_at: string | null;
+  responded_at: string | null;
+  created_at: string;
+}

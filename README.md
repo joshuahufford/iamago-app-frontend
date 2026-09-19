@@ -123,7 +123,7 @@ The Docker image serves `dist/` with nginx, configured to fall back to
 | `/`                     | **Public**    | The discovery quiz and results         |
 | `/recommendations/:id`  | **Public**    | A saved result, opened by claim token  |
 | `/login`, `/register`   | Signed out    | Auth                                   |
-| `/dashboard`            | Signed in     | Account home                           |
+| `/dashboard`            | Signed in     | Patient dashboard: past searches and enquiries |
 | `/portal`               | **Practitioner** | Overview: impressions, clicks, enquiries |
 | `/portal/enquiries`     | **Practitioner** | Enquiries, and recording a response  |
 | `/portal/listing`       | **Practitioner** | Editing their own listing            |
@@ -231,3 +231,21 @@ explains the situation rather than showing an empty dashboard.
   the modal says so rather than showing an empty space.
 - **My listing** — tier and publication state are absent from this form on
   purpose; they are iamago's to set.
+
+## Patient dashboard
+
+`/dashboard` is what a signed-in patient came back for, in two tabs:
+
+- **Past searches** — what they asked for, who came back, and a link straight
+  into the full results (the same tokenised link, so it keeps working).
+- **Practitioners I contacted** — each enquiry and how far it has got, from
+  *Sent* through *Seen by them* to *They replied*. It also restates what was
+  shared, because the patient should not have to remember what they agreed to.
+
+Searches and enquiries made while signed in land here automatically. Ones made
+beforehand are picked up by `SaveSearchButton` on the results page, which offers
+to attach an anonymous search to the account.
+
+That is deliberately a button rather than an automatic claim: result links are
+shareable, and silently filing someone else's search — and the health concerns
+attached to it — under whoever opened the link would be wrong.
