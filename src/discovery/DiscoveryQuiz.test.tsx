@@ -41,6 +41,8 @@ describe('<DiscoveryQuiz />', () => {
       await screen.findByRole('heading', { name: /what brings you here/i }),
     ).toBeInTheDocument();
     expect(await screen.findByRole('checkbox', { name: 'Chronic pain' })).toBeInTheDocument();
+    // Nothing to go back to yet, so the first question offers no way back.
+    expect(screen.queryByRole('button', { name: /back/i })).not.toBeInTheDocument();
   });
 
   it('will not advance until a concern is chosen', async () => {

@@ -31,16 +31,18 @@ export function PublicLayout() {
             <Group gap="xs">
               <ColorSchemeToggle />
               {isAuthenticated ? (
-                <Button component={Link} to="/dashboard" variant="light">
+                <Button component={Link} to="/dashboard" variant="subtle" color="gray">
                   My account
                 </Button>
               ) : (
                 <>
+                  {/* Visitors here are patients, not customers: the account
+                      links stay quiet rather than leading with a sign-up CTA. */}
+                  <Button component={Link} to="/register" variant="subtle" color="gray" visibleFrom="xs">
+                    For practitioners
+                  </Button>
                   <Button component={Link} to="/login" variant="subtle" color="gray">
                     Sign in
-                  </Button>
-                  <Button component={Link} to="/register">
-                    Sign up
                   </Button>
                 </>
               )}
