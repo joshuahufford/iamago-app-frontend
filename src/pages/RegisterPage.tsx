@@ -47,7 +47,7 @@ export function RegisterPage() {
     setSubmitting(true);
     try {
       await register(values);
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       form.setErrors(fieldErrors(error));
       setFormError(errorMessage(error, 'Could not create your account.'));

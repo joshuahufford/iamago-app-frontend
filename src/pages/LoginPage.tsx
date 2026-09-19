@@ -42,7 +42,7 @@ export function LoginPage() {
     setSubmitting(true);
     try {
       await login(values);
-      const destination = (location.state as LocationState | null)?.from?.pathname ?? '/';
+      const destination = (location.state as LocationState | null)?.from?.pathname ?? '/dashboard';
       navigate(destination, { replace: true });
     } catch (error) {
       form.setErrors(fieldErrors(error));

@@ -17,6 +17,7 @@ The companion API lives in [`iamago-app-backend`](https://github.com/joshuahuffo
 | HTTP           | axios (with JWT refresh)       |
 | Routing        | React Router 7                 |
 | Icons          | `@tabler/icons-react`          |
+| Maps           | `@vis.gl/react-google-maps`    |
 | Tests          | Vitest + Testing Library       |
 | Lint           | oxlint                         |
 
@@ -53,12 +54,13 @@ http://localhost:5173/register.
 src/
   api/          axios client, error helpers, endpoint wrappers, shared types
   auth/         token storage, auth context/provider, route guards
-  components/   AppShell layout, color scheme toggle
+  components/   layouts (public + signed-in), Logo, colour scheme toggle
+  discovery/    the patient-facing quiz, result cards and results map
   pages/        one component per route
-  test/         Vitest setup and a render helper wired with every provider
+  test/         Vitest setup, a provider-wired render helper, and fixtures
   App.tsx       route table
   main.tsx      provider tree and entry point
-  theme.ts      Mantine theme (brand palette, defaults)
+  theme.ts      Mantine theme built from the logo palette
 ```
 
 `@/` is an alias for `src/`, configured in both `vite.config.ts` and
@@ -112,3 +114,64 @@ docker build -t iamago-frontend --build-arg VITE_API_BASE_URL=https://api.exampl
 
 The Docker image serves `dist/` with nginx, configured to fall back to
 `index.html` so client-side routes resolve on a hard refresh.
+
+## Routes
+
+| Path                    | Access        | What it is                            |
+| ----------------------- | ------------- | ------------------------------------- |
+| `/`                     | **Public**    | The discovery quiz and results         |
+| `/recommendations/:id`  | **Public**    | A saved result, opened by claim token  |
+| `/login`, `/register`   | Signed out    | Auth                                   |
+| `/dashboard`            | Signed in     | Account home                           |
+| `/profile`              | Signed in     | Account details and password           |
+
+The homepage is deliberately **not** behind a login wall: a visitor runs the
+whole flow and sees their matches before they ever make an account.
+
+## The discovery flow
+
+Three short steps, in `src/discovery/DiscoveryQuiz.tsx`:
+
+1. **Concerns** (required) — what the visitor is trying to solve. This comes
+   first because most people know their problem, not the modality that treats it.
+2. **Approach** (optional, skippable) — a modality preference. Skipping it is
+   normal; the backend infers suitable approaches from the concerns.
+3. **Location** — a city or postal code, plus radius, telehealth and
+   accepting-new-patients filters.
+
+Submitting returns at most three practitioners. Each card lists the reasons the
+engine gave, so the ranking is explainable rather than a black box, and
+`partner` / `verified` practitioners carry a badge.
+
+Results get a real URL — `/recommendations/:id?token=…` — so they can be
+bookmarked and shared. The token is what grants access, not an account, which
+is what makes the link work before sign-up. An id on its own is not enough to
+read someone else's results.
+
+## The map
+
+`src/discovery/ResultsMap.tsx` plots **only the practitioners we recommended**,
+never the whole directory, so the map never implies choices the flow did not
+make. Hovering a card highlights its pin, and the map frames itself to the
+results rather than guessing a zoom level.
+
+The browser key comes from the backend (`/api/directory/map-config/`) rather
+than being baked into the bundle, so it can be rotated in one place. With no key
+configured the component renders a clear "map view unavailable" panel and the
+results are unaffected — the list is always complete.
+
+> **Not yet verified against live Google tiles.** Everything up to and including
+> the API loader receiving the key is covered by tests, but rendering real map
+> tiles needs a Google Maps browser key, which this build did not have. Set
+> `GOOGLE_MAPS_BROWSER_KEY` on the backend and check the map once before
+> shipping it.
+
+## Brand
+
+`src/theme.ts` builds the Mantine palette from the logo: teal (`#00a69c`) is the
+primary, with plum, sky, indigo, coral and pink available as accents.
+
+The logo lives in `src/components/Logo.tsx` as inline SVG rather than an
+`<img>`, because the wordmark is drawn with `currentColor` — an `<img>` cannot
+inherit it, which would leave the word invisible in dark mode. `public/logo.svg`
+and `public/logo-mark.svg` are kept for favicons and external use.

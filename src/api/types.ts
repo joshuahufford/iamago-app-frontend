@@ -62,3 +62,90 @@ export interface Paginated<T> {
   previous: string | null;
   results: T[];
 }
+
+// --- Directory ------------------------------------------------------------
+
+export type PractitionerTier = 'partner' | 'verified' | 'standard';
+
+export interface Modality {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+}
+
+export interface HealthConcern {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  /** Slugs of the modalities typically used for this concern. */
+  modalities: string[];
+}
+
+export interface Practitioner {
+  id: string;
+  display_name: string;
+  credentials: string;
+  practice_name: string;
+  bio: string;
+  photo_url: string;
+  website: string;
+  phone: string;
+  email: string;
+  years_experience: number | null;
+  modalities: Modality[];
+  concerns: HealthConcern[];
+  address_line1: string;
+  address_line2: string;
+  city: string;
+  region: string;
+  postal_code: string;
+  country: string;
+  latitude: number | null;
+  longitude: number | null;
+  offers_telehealth: boolean;
+  accepting_new_patients: boolean;
+  accepts_insurance: boolean;
+  tier: PractitionerTier;
+  is_preferred: boolean;
+}
+
+export interface Recommendation {
+  rank: number;
+  score: number;
+  distance_km: number | null;
+  reasons: string[];
+  practitioner: Practitioner;
+}
+
+export interface RecommendationRequest {
+  id: string;
+  claim_token: string;
+  concerns: HealthConcern[];
+  modalities: Modality[];
+  location_label: string;
+  latitude: number | null;
+  longitude: number | null;
+  radius_km: number;
+  include_telehealth: boolean;
+  accepting_new_patients_only: boolean;
+  created_at: string;
+  recommendations: Recommendation[];
+}
+
+export interface RecommendationPayload {
+  concerns: string[];
+  modalities: string[];
+  location_label?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  radius_km?: number;
+  include_telehealth?: boolean;
+  accepting_new_patients_only?: boolean;
+}
+
+export interface MapConfig {
+  google_maps_api_key: string;
+  maps_enabled: boolean;
+}

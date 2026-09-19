@@ -13,7 +13,7 @@ export function NotFoundPage() {
           The page you are looking for doesn&apos;t exist or has moved.
         </Text>
         <Button component={Link} to="/" mt="md">
-          Back to dashboard
+          Back to home
         </Button>
       </Stack>
     </Center>

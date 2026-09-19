@@ -1,4 +1,5 @@
 import {
+  Anchor,
   AppShell,
   Avatar,
   Burger,
@@ -6,18 +7,18 @@ import {
   Menu,
   NavLink,
   Text,
-  Title,
   UnstyledButton,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconLayoutDashboard, IconLogout, IconUser } from '@tabler/icons-react';
-import { NavLink as RouterNavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink as RouterNavLink, Outlet, useNavigate } from 'react-router-dom';
 
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle';
+import { Logo } from '@/components/Logo';
 import { useAuth } from '@/auth/useAuth';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', to: '/', icon: IconLayoutDashboard },
+  { label: 'Dashboard', to: '/dashboard', icon: IconLayoutDashboard },
   { label: 'Profile', to: '/profile', icon: IconUser },
 ];
 
@@ -41,7 +42,9 @@ export function AppLayout() {
         <Group h="100%" px="md" justify="space-between">
           <Group gap="sm">
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-            <Title order={4}>iamago</Title>
+            <Anchor component={Link} to="/" underline="never" c="inherit">
+              <Logo height={32} />
+            </Anchor>
           </Group>
 
           <Group gap="sm">
@@ -86,7 +89,6 @@ export function AppLayout() {
             key={to}
             component={RouterNavLink}
             to={to}
-            end={to === '/'}
             label={label}
             leftSection={<Icon size={18} stroke={1.6} />}
             onClick={close}

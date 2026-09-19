@@ -47,3 +47,90 @@ export const mockUser = {
     theme: 'auto' as const,
   },
 };
+
+// --- Directory fixtures ---------------------------------------------------
+
+import type {
+  HealthConcern,
+  Modality,
+  Practitioner,
+  Recommendation,
+  RecommendationRequest,
+} from '@/api/types';
+
+export const mockModality = (overrides: Partial<Modality> = {}): Modality => ({
+  id: 'mod-acupuncture',
+  name: 'Acupuncture',
+  slug: 'acupuncture',
+  description: '',
+  ...overrides,
+});
+
+export const mockConcern = (overrides: Partial<HealthConcern> = {}): HealthConcern => ({
+  id: 'con-pain',
+  name: 'Chronic pain',
+  slug: 'chronic-pain',
+  description: '',
+  modalities: ['acupuncture'],
+  ...overrides,
+});
+
+export const mockPractitioner = (
+  overrides: Partial<Practitioner> = {},
+): Practitioner => ({
+  id: 'prac-1',
+  display_name: 'Maya Ellison',
+  credentials: 'LAc, DACM',
+  practice_name: 'Still Point Acupuncture',
+  bio: '',
+  photo_url: '',
+  website: 'https://example.com/maya',
+  phone: '+1 512 555 0100',
+  email: '',
+  years_experience: 12,
+  modalities: [mockModality()],
+  concerns: [mockConcern()],
+  address_line1: '',
+  address_line2: '',
+  city: 'Austin',
+  region: 'TX',
+  postal_code: '78704',
+  country: 'US',
+  latitude: 30.25,
+  longitude: -97.75,
+  offers_telehealth: true,
+  accepting_new_patients: true,
+  accepts_insurance: false,
+  tier: 'partner',
+  is_preferred: true,
+  ...overrides,
+});
+
+export const mockRecommendation = (
+  overrides: Partial<Recommendation> = {},
+): Recommendation => ({
+  rank: 1,
+  score: 89.56,
+  distance_km: 2.02,
+  reasons: ['Treats 1 of your 1 concern', '2.0 km away', 'iamago partner'],
+  practitioner: mockPractitioner(),
+  ...overrides,
+});
+
+export const mockRecommendationRequest = (
+  overrides: Partial<RecommendationRequest> = {},
+): RecommendationRequest => ({
+  id: 'req-1',
+  claim_token: 'token-abc',
+  concerns: [mockConcern()],
+  modalities: [],
+  location_label: 'Austin, TX, USA',
+  latitude: 30.2672,
+  longitude: -97.7431,
+  radius_km: 40,
+  include_telehealth: true,
+  accepting_new_patients_only: false,
+  created_at: '2026-09-19T00:00:00Z',
+  recommendations: [mockRecommendation()],
+  ...overrides,
+});
