@@ -4,6 +4,7 @@ import type {
   MapConfig,
   Modality,
   Practitioner,
+  PractitionerEventKind,
   RecommendationPayload,
   RecommendationRequest,
 } from '@/api/types';
@@ -38,6 +39,24 @@ export const directoryApi = {
   async practitioner(id: string): Promise<Practitioner> {
     const { data } = await api.get<Practitioner>(`/directory/practitioners/${id}/`);
     return data;
+  },
+
+  /**
+   * Report a click-through. Best-effort: a failure here must never interrupt
+   * the visitor, so callers do not await it and errors are swallowed.
+   */
+  recordEvent(
+    practitioner: string,
+    kind: PractitionerEventKind,
+    requestId?: string,
+  ): void {
+    void api
+      .post('/directory/events/', {
+        practitioner,
+        kind,
+        ...(requestId ? { request_id: requestId } : {}),
+      })
+      .catch(() => undefined);
   },
 
   async mapConfig(): Promise<MapConfig> {

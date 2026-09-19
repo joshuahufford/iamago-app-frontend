@@ -24,10 +24,10 @@ const STEPS = ['concerns', 'modalities', 'location'] as const;
 type Step = (typeof STEPS)[number];
 
 const RADIUS_OPTIONS = [
-  { value: '15', label: 'Within 15 km' },
-  { value: '40', label: 'Within 40 km' },
-  { value: '80', label: 'Within 80 km' },
-  { value: '160', label: 'Within 160 km' },
+  { value: '10', label: 'Within 10 miles' },
+  { value: '25', label: 'Within 25 miles' },
+  { value: '50', label: 'Within 50 miles' },
+  { value: '100', label: 'Within 100 miles' },
 ];
 
 /**
@@ -49,6 +49,12 @@ interface DiscoveryQuizProps {
   onSubmit: (payload: RecommendationPayload) => void;
   isSubmitting: boolean;
   error?: string | null;
+  /**
+   * Set once the free daily allowance is spent. The email field only appears
+   * then — the promise on the landing page is that you need no account, and
+   * asking upfront would break it for the people it was made to.
+   */
+  requiresEmail?: boolean;
 }
 
 /**
@@ -59,15 +65,22 @@ interface DiscoveryQuizProps {
  * Rendered as the whole page rather than a card — the first question is the
  * homepage, so the question carries the page's typography.
  */
-export function DiscoveryQuiz({ onSubmit, isSubmitting, error }: DiscoveryQuizProps) {
+export function DiscoveryQuiz({
+  onSubmit,
+  isSubmitting,
+  error,
+  requiresEmail = false,
+}: DiscoveryQuizProps) {
   const [step, setStep] = useState<Step>('concerns');
   const [concerns, setConcerns] = useState<string[]>([]);
   const [modalities, setModalities] = useState<string[]>([]);
   const [location, setLocation] = useState('');
-  const [radius, setRadius] = useState('40');
+  const [radius, setRadius] = useState('25');
   const [includeTelehealth, setIncludeTelehealth] = useState(true);
   const [acceptingOnly, setAcceptingOnly] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [hasMoved, setHasMoved] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -107,14 +120,20 @@ export function DiscoveryQuiz({ onSubmit, isSubmitting, error }: DiscoveryQuizPr
       setLocationError('Enter a city or postal code.');
       return;
     }
+    if (requiresEmail && !/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setEmailError('Enter a valid email to keep searching.');
+      return;
+    }
     setLocationError(null);
+    setEmailError(null);
     onSubmit({
       concerns,
       modalities,
       location_label: location.trim(),
-      radius_km: Number(radius),
+      radius_miles: Number(radius),
       include_telehealth: includeTelehealth,
       accepting_new_patients_only: acceptingOnly,
+      ...(requiresEmail ? { email: email.trim() } : {}),
     });
   }
 
@@ -226,10 +245,27 @@ export function DiscoveryQuiz({ onSubmit, isSubmitting, error }: DiscoveryQuizPr
             label="Search radius"
             data={RADIUS_OPTIONS}
             value={radius}
-            onChange={(value) => setRadius(value ?? '40')}
+            onChange={(value) => setRadius(value ?? '25')}
             allowDeselect={false}
             size="md"
           />
+
+          {requiresEmail && (
+            <TextInput
+              required
+              label="Your email"
+              type="email"
+              placeholder="you@example.com"
+              size="md"
+              value={email}
+              error={emailError}
+              description="You have used today's free searches. Add an email to keep going."
+              onChange={(event) => {
+                setEmail(event.currentTarget.value);
+                setEmailError(null);
+              }}
+            />
+          )}
 
           <Stack gap="xs" mt={4}>
             <Checkbox
@@ -274,7 +310,11 @@ export function DiscoveryQuiz({ onSubmit, isSubmitting, error }: DiscoveryQuizPr
 
         {step === 'location' && (
           <Text size="xs" c={QUIET} ta="center" maw={420}>
-            No account needed. Your matches get their own link to keep or pass on.
+            {requiresEmail
+              ? // Claiming "no account needed" while asking for an email would
+                // be a lie, so say what the email is actually for.
+                'We use this to keep the directory from being scraped. Still no account, and your matches keep their own link.'
+              : 'No account needed. Your matches get their own link to keep or pass on.'}
           </Text>
         )}
 

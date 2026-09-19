@@ -109,4 +109,33 @@ describe('<HomePage />', () => {
     );
     expect(await screen.findByText(/Still Point Acupuncture/)).toBeInTheDocument();
   });
+
+  it('asks for an email when the daily allowance is spent', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(api, 'get').mockImplementation((url: string) => {
+      if (url === '/directory/concerns/') return Promise.resolve({ data: [mockConcern()] });
+      return Promise.resolve({ data: [] });
+    });
+    vi.spyOn(api, 'post').mockRejectedValue(
+      Object.assign(new Error('Request failed'), {
+        isAxiosError: true,
+        response: {
+          status: 429,
+          data: { detail: 'Out of free searches.', errors: {}, code: 'email_required' },
+        },
+      }),
+    );
+
+    renderWithProviders(<HomePage />);
+
+    const chip = await screen.findByRole('checkbox', { name: 'Chronic pain' });
+    await user.click(chip);
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await user.click(await screen.findByRole('button', { name: /skip|continue/i }));
+    await user.type(await screen.findByLabelText('Location'), 'Austin');
+    await user.click(screen.getByRole('button', { name: /find my matches/i }));
+
+    // The gate only appears after the limit is hit, never before.
+    expect(await screen.findByLabelText(/your email/i)).toBeInTheDocument();
+  });
 });

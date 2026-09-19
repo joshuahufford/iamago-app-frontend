@@ -33,7 +33,7 @@ const THREE = [
   }),
   mockRecommendation({
     rank: 3,
-    reasons: ['12.0 km away'],
+    reasons: ['12.0 mi away'],
     practitioner: mockPractitioner({
       id: 'p3',
       display_name: 'Corey Whitfield',

@@ -175,3 +175,28 @@ The logo lives in `src/components/Logo.tsx` as inline SVG rather than an
 `<img>`, because the wordmark is drawn with `currentColor` — an `<img>` cannot
 inherit it, which would leave the word invisible in dark mode. `public/logo.svg`
 and `public/logo-mark.svg` are kept for favicons and external use.
+
+## Distances and the search limit
+
+Distances are **miles** throughout — the radius options, the API payload
+(`radius_miles`) and the values on each result (`distance_miles`).
+
+Searching is metered per visitor per day by the backend. Inside the free
+allowance nothing appears; once it is spent the API answers `429` with
+`code: "email_required"`, and `HomePage` flips `DiscoveryQuiz` into its
+`requiresEmail` state, which adds an email field to the location step and
+keeps the answers already given. The microcopy changes with it — claiming
+"no account needed" while asking for an email would be a lie.
+
+`errorCode()` in `src/api/client.ts` reads that `code`, alongside
+`errorMessage()` and `fieldErrors()`.
+
+## Click tracking
+
+`directoryApi.recordEvent(practitionerId, kind, requestId)` reports a
+click-through on a phone number or website. It is deliberately fire-and-forget:
+nothing is awaited and errors are swallowed, because analytics must never
+interrupt a visitor.
+
+Impressions are **not** sent from here — the backend records those when it
+produces a recommendation, so partner numbers cannot be inflated by the client.

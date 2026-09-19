@@ -111,7 +111,7 @@ describe('<DiscoveryQuiz />', () => {
       concerns: ['con-pain'],
       modalities: [],
       location_label: 'Austin, TX',
-      radius_km: 40,
+      radius_miles: 25,
       include_telehealth: true,
       accepting_new_patients_only: false,
     });
@@ -131,6 +131,57 @@ describe('<DiscoveryQuiz />', () => {
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
     expect(onSubmit.mock.calls[0][0].modalities).toEqual(['mod-acu']);
+  });
+
+  it('asks for no email while the visitor is inside the free allowance', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<DiscoveryQuiz onSubmit={vi.fn()} isSubmitting={false} />);
+
+    await goToLocationStep(user);
+
+    expect(screen.queryByLabelText(/your email/i)).not.toBeInTheDocument();
+  });
+
+  it('asks for an email once the allowance is spent', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    renderWithProviders(
+      <DiscoveryQuiz onSubmit={onSubmit} isSubmitting={false} requiresEmail />,
+    );
+
+    await goToLocationStep(user);
+    await user.type(screen.getByLabelText('Location'), 'Austin');
+    await user.click(screen.getByRole('button', { name: /find my matches/i }));
+
+    expect(
+      await screen.findByText('Enter a valid email to keep searching.'),
+    ).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('sends the email once the gate is satisfied', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    renderWithProviders(
+      <DiscoveryQuiz onSubmit={onSubmit} isSubmitting={false} requiresEmail />,
+    );
+
+    await goToLocationStep(user);
+    await user.type(screen.getByLabelText('Location'), 'Austin');
+    await user.type(screen.getByLabelText(/your email/i), 'patient@example.com');
+    await user.click(screen.getByRole('button', { name: /find my matches/i }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0].email).toBe('patient@example.com');
+  });
+
+  it('offers radius choices in miles', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<DiscoveryQuiz onSubmit={vi.fn()} isSubmitting={false} />);
+
+    await goToLocationStep(user);
+
+    expect(screen.getByDisplayValue('Within 25 miles')).toBeInTheDocument();
   });
 
   it('surfaces a submission error', async () => {

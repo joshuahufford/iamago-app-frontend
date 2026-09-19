@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { directoryApi } from '@/api/directory';
-import { errorMessage } from '@/api/client';
+import { errorCode, errorMessage } from '@/api/client';
 import type { RecommendationPayload, RecommendationRequest } from '@/api/types';
 import { DiscoveryQuiz } from '@/discovery/DiscoveryQuiz';
 import { ResultsView } from '@/discovery/ResultsView';
@@ -19,16 +19,24 @@ import { ResultsView } from '@/discovery/ResultsView';
  */
 export function HomePage() {
   const [result, setResult] = useState<RecommendationRequest | null>(null);
+  const [requiresEmail, setRequiresEmail] = useState(false);
   const navigate = useNavigate();
 
   const recommend = useMutation({
     mutationFn: (payload: RecommendationPayload) => directoryApi.recommend(payload),
     onSuccess: (data) => {
       setResult(data);
+      setRequiresEmail(false);
       // Give the results a real URL so they can be bookmarked or shared.
       navigate(`/recommendations/${data.id}?token=${encodeURIComponent(data.claim_token)}`, {
         state: { result: data },
       });
+    },
+    onError: (error) => {
+      // The daily allowance is spent; asking for an email raises the ceiling.
+      if (errorCode(error) === 'email_required') {
+        setRequiresEmail(true);
+      }
     },
   });
 
@@ -69,6 +77,7 @@ export function HomePage() {
           <DiscoveryQuiz
             onSubmit={(payload) => recommend.mutate(payload)}
             isSubmitting={recommend.isPending}
+            requiresEmail={requiresEmail}
             error={recommend.isError ? errorMessage(recommend.error) : null}
           />
         </Box>

@@ -111,8 +111,8 @@ export const mockRecommendation = (
 ): Recommendation => ({
   rank: 1,
   score: 89.56,
-  distance_km: 2.02,
-  reasons: ['Treats 1 of your 1 concern', '2.0 km away', 'iamago partner'],
+  distance_miles: 2.02,
+  reasons: ['Treats 1 of your 1 concern', '2.0 mi away', 'iamago partner'],
   practitioner: mockPractitioner(),
   ...overrides,
 });
@@ -127,7 +127,7 @@ export const mockRecommendationRequest = (
   location_label: 'Austin, TX, USA',
   latitude: 30.2672,
   longitude: -97.7431,
-  radius_km: 40,
+  radius_miles: 25,
   include_telehealth: true,
   accepting_new_patients_only: false,
   created_at: '2026-09-19T00:00:00Z',

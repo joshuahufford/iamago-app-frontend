@@ -89,6 +89,12 @@ export function errorMessage(error: unknown, fallback = 'Something went wrong.')
   return fallback;
 }
 
+/** Machine-readable code on an error, where the backend sends one. */
+export function errorCode(error: unknown): string {
+  if (!axios.isAxiosError<ApiErrorBody & { code?: string }>(error)) return '';
+  return error.response?.data?.code ?? '';
+}
+
 /** Field-level errors from the backend envelope, flattened for Mantine forms. */
 export function fieldErrors(error: unknown): Record<string, string> {
   if (!axios.isAxiosError<ApiErrorBody>(error)) return {};

@@ -114,7 +114,7 @@ export interface Practitioner {
 export interface Recommendation {
   rank: number;
   score: number;
-  distance_km: number | null;
+  distance_miles: number | null;
   reasons: string[];
   practitioner: Practitioner;
 }
@@ -127,7 +127,7 @@ export interface RecommendationRequest {
   location_label: string;
   latitude: number | null;
   longitude: number | null;
-  radius_km: number;
+  radius_miles: number;
   include_telehealth: boolean;
   accepting_new_patients_only: boolean;
   created_at: string;
@@ -140,10 +140,15 @@ export interface RecommendationPayload {
   location_label?: string;
   latitude?: number | null;
   longitude?: number | null;
-  radius_km?: number;
+  radius_miles?: number;
   include_telehealth?: boolean;
   accepting_new_patients_only?: boolean;
+  /** Only needed once the free daily allowance is spent. */
+  email?: string;
 }
+
+/** Click-throughs the browser reports; impressions are recorded server-side. */
+export type PractitionerEventKind = 'profile' | 'phone' | 'website';
 
 export interface MapConfig {
   google_maps_api_key: string;

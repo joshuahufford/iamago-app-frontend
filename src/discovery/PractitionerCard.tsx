@@ -18,6 +18,7 @@ import {
   IconWorld,
 } from '@tabler/icons-react';
 
+import { directoryApi } from '@/api/directory';
 import type { Recommendation } from '@/api/types';
 import { TIER_COLOR, TIER_LABEL } from '@/theme';
 
@@ -26,6 +27,8 @@ interface PractitionerCardProps {
   active?: boolean;
   onHover?: (practitionerId: string | null) => void;
   onSelect?: (practitionerId: string) => void;
+  /** Ties a click back to the search that produced it, for partner reporting. */
+  requestId?: string;
 }
 
 export function PractitionerCard({
@@ -33,6 +36,7 @@ export function PractitionerCard({
   active = false,
   onHover,
   onSelect,
+  requestId,
 }: PractitionerCardProps) {
   const { practitioner, rank, reasons } = recommendation;
   const tierLabel = TIER_LABEL[practitioner.tier];
@@ -128,7 +132,14 @@ export function PractitionerCard({
 
         <Group gap="lg">
           {practitioner.phone && (
-            <Anchor href={`tel:${practitioner.phone}`} size="sm" onClick={stop}>
+            <Anchor
+              href={`tel:${practitioner.phone}`}
+              size="sm"
+              onClick={(event) => {
+                stop(event);
+                directoryApi.recordEvent(practitioner.id, 'phone', requestId);
+              }}
+            >
               <Group gap={4} wrap="nowrap">
                 <IconPhone size={15} stroke={1.6} />
                 {practitioner.phone}
@@ -141,7 +152,10 @@ export function PractitionerCard({
               target="_blank"
               rel="noopener noreferrer"
               size="sm"
-              onClick={stop}
+              onClick={(event) => {
+                stop(event);
+                directoryApi.recordEvent(practitioner.id, 'website', requestId);
+              }}
             >
               <Group gap={4} wrap="nowrap">
                 <IconWorld size={15} stroke={1.6} />

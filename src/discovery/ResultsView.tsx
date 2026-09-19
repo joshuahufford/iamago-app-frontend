@@ -97,6 +97,7 @@ export function ResultsView({ result, onStartOver, shareUrl }: ResultsViewProps)
                 recommendation={recommendation}
                 active={activeId === recommendation.practitioner.id}
                 onHover={setActiveId}
+                requestId={result.id}
               />
             ))}
           </Stack>
@@ -141,7 +142,7 @@ function NoMatches({
       <Title order={3}>No matches near {result.location_label}</Title>
       <Text c="dimmed" ta="center" maw={440}>
         We could not find a practitioner matching what you are looking for within{' '}
-        {result.radius_km} km. Try widening the search radius, including
+        {result.radius_miles} miles. Try widening the search radius, including
         telehealth, or choosing a nearby city.
       </Text>
       {onStartOver && (
