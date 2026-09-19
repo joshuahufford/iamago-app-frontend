@@ -154,3 +154,76 @@ export interface MapConfig {
   google_maps_api_key: string;
   maps_enabled: boolean;
 }
+
+// --- Outreach -------------------------------------------------------------
+
+export interface ContactRequestPayload {
+  practitioner: string;
+  recommendation_request?: string | null;
+  name: string;
+  email: string;
+  phone?: string;
+  message?: string;
+  share_concerns: boolean;
+  consent: boolean;
+}
+
+export interface ContactRequestAck {
+  id: string;
+  practitioner_name: string;
+  created_at: string;
+}
+
+// --- Practitioner portal --------------------------------------------------
+
+export type ContactRequestStatus = 'new' | 'viewed' | 'responded' | 'closed';
+
+export interface PortalContactRequest {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  concerns: HealthConcern[];
+  search_location: string;
+  share_concerns: boolean;
+  status: ContactRequestStatus;
+  practitioner_note: string;
+  first_viewed_at: string | null;
+  responded_at: string | null;
+  created_at: string;
+}
+
+export interface PortalStats {
+  days: number;
+  since: string;
+  impressions: number;
+  profile_views: number;
+  phone_reveals: number;
+  website_clicks: number;
+  clicks: number;
+  click_through_rate: number;
+  contact_requests: number;
+  new_contact_requests: number;
+  tier: PractitionerTier;
+}
+
+export interface PortalListingUpdate {
+  display_name?: string;
+  credentials?: string;
+  practice_name?: string;
+  bio?: string;
+  website?: string;
+  phone?: string;
+  email?: string;
+  years_experience?: number | null;
+  modalities?: string[];
+  concerns?: string[];
+  address_line1?: string;
+  city?: string;
+  region?: string;
+  postal_code?: string;
+  offers_telehealth?: boolean;
+  accepting_new_patients?: boolean;
+  accepts_insurance?: boolean;
+}

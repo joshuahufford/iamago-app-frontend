@@ -2,6 +2,7 @@ import {
   Anchor,
   Avatar,
   Badge,
+  Button,
   Box,
   Card,
   Group,
@@ -12,6 +13,7 @@ import {
 } from '@mantine/core';
 import {
   IconCheck,
+  IconMail,
   IconMapPin,
   IconPhone,
   IconVideo,
@@ -29,6 +31,7 @@ interface PractitionerCardProps {
   onSelect?: (practitionerId: string) => void;
   /** Ties a click back to the search that produced it, for partner reporting. */
   requestId?: string;
+  onRequestContact?: (practitionerId: string) => void;
 }
 
 export function PractitionerCard({
@@ -37,6 +40,7 @@ export function PractitionerCard({
   onHover,
   onSelect,
   requestId,
+  onRequestContact,
 }: PractitionerCardProps) {
   const { practitioner, rank, reasons } = recommendation;
   const tierLabel = TIER_LABEL[practitioner.tier];
@@ -129,6 +133,19 @@ export function PractitionerCard({
             </Group>
           )}
         </Group>
+
+        {onRequestContact && (
+          <Button
+            variant="light"
+            leftSection={<IconMail size={16} stroke={1.6} />}
+            onClick={(event) => {
+              event.stopPropagation();
+              onRequestContact(practitioner.id);
+            }}
+          >
+            Ask them to contact me
+          </Button>
+        )}
 
         <Group gap="lg">
           {practitioner.phone && (

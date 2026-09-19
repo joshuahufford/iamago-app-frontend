@@ -15,6 +15,8 @@ import { useState } from 'react';
 
 import { directoryApi } from '@/api/directory';
 import type { RecommendationRequest } from '@/api/types';
+import { ContactRequestModal } from '@/discovery/ContactRequestModal';
+import { EmailMatchesButton } from '@/discovery/EmailMatchesButton';
 import { PractitionerCard } from '@/discovery/PractitionerCard';
 import { ResultsMap } from '@/discovery/ResultsMap';
 
@@ -26,6 +28,7 @@ interface ResultsViewProps {
 
 export function ResultsView({ result, onStartOver, shareUrl }: ResultsViewProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [contacting, setContacting] = useState<string | null>(null);
 
   // The browser key lives on the backend so it can be rotated in one place.
   const mapConfig = useQuery({
@@ -61,6 +64,7 @@ export function ResultsView({ result, onStartOver, shareUrl }: ResultsViewProps)
         </Stack>
 
         <Group gap="xs">
+          <EmailMatchesButton requestId={result.id} token={result.claim_token} />
           {shareUrl && (
             <CopyButton value={shareUrl} timeout={2000}>
               {({ copied, copy }) => (
@@ -98,6 +102,7 @@ export function ResultsView({ result, onStartOver, shareUrl }: ResultsViewProps)
                 active={activeId === recommendation.practitioner.id}
                 onHover={setActiveId}
                 requestId={result.id}
+                onRequestContact={setContacting}
               />
             ))}
           </Stack>
@@ -117,6 +122,16 @@ export function ResultsView({ result, onStartOver, shareUrl }: ResultsViewProps)
           </Box>
         </Grid.Col>
       </Grid>
+
+      <ContactRequestModal
+        practitioner={
+          recommendations.find((r) => r.practitioner.id === contacting)?.practitioner ??
+          null
+        }
+        requestId={result.id}
+        hasConcerns={result.concerns.length > 0}
+        onClose={() => setContacting(null)}
+      />
 
       <Alert variant="light" color="gray">
         <Text size="sm">

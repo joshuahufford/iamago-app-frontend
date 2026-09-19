@@ -55,7 +55,8 @@ src/
   api/          axios client, error helpers, endpoint wrappers, shared types
   auth/         token storage, auth context/provider, route guards
   components/   layouts (public + signed-in), Logo, colour scheme toggle
-  discovery/    the patient-facing quiz, result cards and results map
+  discovery/    the patient-facing quiz, result cards, map and contact form
+  portal/       the practitioner portal (overview, enquiries, listing editor)
   pages/        one component per route
   test/         Vitest setup, a provider-wired render helper, and fixtures
   App.tsx       route table
@@ -123,6 +124,9 @@ The Docker image serves `dist/` with nginx, configured to fall back to
 | `/recommendations/:id`  | **Public**    | A saved result, opened by claim token  |
 | `/login`, `/register`   | Signed out    | Auth                                   |
 | `/dashboard`            | Signed in     | Account home                           |
+| `/portal`               | **Practitioner** | Overview: impressions, clicks, enquiries |
+| `/portal/enquiries`     | **Practitioner** | Enquiries, and recording a response  |
+| `/portal/listing`       | **Practitioner** | Editing their own listing            |
 | `/profile`              | Signed in     | Account details and password           |
 
 The homepage is deliberately **not** behind a login wall: a visitor runs the
@@ -200,3 +204,30 @@ interrupt a visitor.
 
 Impressions are **not** sent from here — the backend records those when it
 produces a recommendation, so partner numbers cannot be inflated by the client.
+
+## Contact requests
+
+`ContactRequestModal` is how a patient asks a practitioner to get in touch.
+
+Sharing the health concerns from the search is **opt-in and off by default**,
+and the consent checkbox's wording changes with it — it names exactly what will
+be shared and with whom, because that sentence is stored verbatim on the server
+as the record of what was agreed.
+
+`EmailMatchesButton` mails a visitor their own results. The claim token
+authorises the send, so nobody can have someone else's matches mailed anywhere.
+
+## Practitioner portal
+
+`/portal` needs more than a signed-in user: the account has to be linked to a
+listing. `PortalGuard` checks that by calling `/api/portal/me/` and, on a 403,
+explains the situation rather than showing an empty dashboard.
+
+- **Overview** — impressions, click-throughs, click rate and enquiries over a
+  selectable window. These are the numbers a partner is paying for.
+- **Enquiries** — opening one *fetches the detail*, which is what records the
+  access server-side, so a practitioner is only counted as having read an
+  enquiry when they actually open it. Where a patient withheld their concerns,
+  the modal says so rather than showing an empty space.
+- **My listing** — tier and publication state are absent from this form on
+  purpose; they are iamago's to set.

@@ -10,6 +10,11 @@ import { NotFoundPage } from '@/pages/NotFoundPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { RecommendationsPage } from '@/pages/RecommendationsPage';
 import { RegisterPage } from '@/pages/RegisterPage';
+import { PortalEnquiries } from '@/portal/PortalEnquiries';
+import { PortalGuard } from '@/portal/PortalGuard';
+import { PortalLayout } from '@/portal/PortalLayout';
+import { PortalListing } from '@/portal/PortalListing';
+import { PortalOverview } from '@/portal/PortalOverview';
 
 export function App() {
   return (
@@ -23,6 +28,15 @@ export function App() {
       <Route element={<PublicOnlyRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+      </Route>
+
+      {/* Practitioner portal: signed in *and* linked to a listing. */}
+      <Route element={<PortalGuard />}>
+        <Route element={<PortalLayout />}>
+          <Route path="/portal" element={<PortalOverview />} />
+          <Route path="/portal/enquiries" element={<PortalEnquiries />} />
+          <Route path="/portal/listing" element={<PortalListing />} />
+        </Route>
       </Route>
 
       <Route element={<ProtectedRoute />}>

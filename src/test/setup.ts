@@ -23,6 +23,19 @@ window.matchMedia =
     dispatchEvent: vi.fn(),
   })) as unknown as typeof window.matchMedia;
 
+// jsdom does not implement the FontFaceSet API, and Mantine's autosizing
+// Textarea listens for `loadingdone` on it to re-measure after webfonts land.
+if (!document.fonts) {
+  Object.defineProperty(document, 'fonts', {
+    configurable: true,
+    value: {
+      ready: Promise.resolve(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    },
+  });
+}
+
 class ResizeObserverStub {
   observe() {}
   unobserve() {}
