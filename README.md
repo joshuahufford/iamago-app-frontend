@@ -96,6 +96,12 @@ them, and only unattached errors become a toast.
 3. Add a nav entry to `NAV_ITEMS` in `src/components/AppLayout.tsx`.
 4. Put API calls in `src/api/` and read them with TanStack Query.
 
+## Deployment
+
+See [`DEPLOY.md`](DEPLOY.md). The short version: `VITE_API_BASE_URL` is inlined
+at **build** time, so changing it needs a redeploy, and `vercel.json` carries
+the SPA rewrite without which a hard refresh on any route 404s.
+
 ## Configuration
 
 | Variable             | Default  | Purpose                                        |
